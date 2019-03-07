@@ -1,0 +1,70 @@
+\documentclass{article}
+% Inspired by http://www.texample.net/tikz/examples/simple-flow-chart/
+
+%\usepackage[latin1]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{shapes,shapes.misc,arrows}
+
+% define colours
+\definecolor{CS101Red}   {RGB} {228,  0,102}
+\definecolor{CS101Yellow}{RGB} {234,196, 53}
+\definecolor{CS101Green} {RGB} {  3,206,164}
+\definecolor{CS101Blue}  {RGB} { 52, 89,149}
+\definecolor{CS101Grey}  {RGB} { 93, 93, 93}
+\definecolor{CS101White} {RGB} {255,255,255}
+
+% use Ubuntu fonts:
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Ubuntu Mono Bold}
+\setsansfont{Ubuntu Bold}
+\setmonofont{Ubuntu Mono Bold}
+
+\begin{document}
+\pagestyle{empty}
+
+\newcommand{\maincolor}{CS101Blue}
+\newcommand{\mainline}{0.025in}
+\newcommand{\auxcolor}{CS101Yellow}
+\newcommand{\goodcolor}{CS101Green}
+\newcommand{\badcolor}{CS101Red}
+
+% Define block styles
+\tikzstyle{decision}= [diamond, draw=\maincolor, line width=\mainline,
+    text width=4.5em, text badly centered, node distance=1in, inner sep=0pt]
+\tikzstyle{process} = [rectangle, draw=\maincolor, line width=\mainline,
+    text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{terminal}= [rounded rectangle,draw=\maincolor, line width=\mainline,
+    text width=5em, text centered, node distance=1in, minimum height=3em,
+    inner sep=0pt]
+\tikzstyle{line}    = [draw=\maincolor, line width=\mainline, -latex']
+\tikzstyle{auxline} = [draw=\auxcolor, line width=\mainline, -latex']
+
+\begin{tikzpicture}[node distance = 2cm, auto]
+% Place nodes
+\node [terminal] (init)
+	{\uppercase {initialize model}};
+\node [terminal,left of=init,draw=\goodcolor] (expert) 
+	{\uppercase {expert}};
+\node [terminal,right of=init,draw=\badcolor] (system)
+	{\uppercase {system}};
+\node [process,below of=init] (identify) {identify candidate models};
+\node [process,below of=identify] (evaluate) {evaluate candidate models};
+\node [process,left of=evaluate, node distance=3cm] (update) {update model};
+\node [decision,below of=evaluate] (decide) {IS BEST CANDIDATE BETTER?};
+\node [terminal,below of=decide, node distance=3cm] (stop) {stop};
+
+% Draw edges
+\path [line] (init) -- (identify);
+\path [line] (identify) -- (evaluate);
+\path [line] (evaluate) -- (decide);
+\path [line,draw=\goodcolor] (decide) -| node [near start] {True} (update);
+\path [line] (update) |- (identify);
+\path [line,draw=\badcolor] (decide) -- node {False}(stop);
+\path [auxline,dashed,draw=\goodcolor] (expert) -- (init);
+\path [auxline,dashed,draw=\badcolor] (system) -- (init);
+\path [auxline,dashed] (evaluate) -| (system);
+
+\end{tikzpicture}
+
+\end{document}
